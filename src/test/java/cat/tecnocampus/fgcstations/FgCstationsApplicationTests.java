@@ -1,27 +1,31 @@
 package cat.tecnocampus.fgcstations;
 
 import cat.tecnocampus.fgcstations.application.DTOs.FriendsDTO;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
+import org.springframework.web.client.RestTemplate;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 @SpringBootTest
 class FgCstationsApplicationTests {
 
-
-    private TestRestTemplate restTemplate = new TestRestTemplate();
+    @Autowired
+    private RestTemplate restTemplate;
 
     @LocalServerPort
     private int port;
 
-    @Test
-    void contextLoads() {
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return builder.build();
     }
 
     @Test
@@ -31,7 +35,7 @@ class FgCstationsApplicationTests {
         validFriend.setUsername("validusername"); // Valid username (between 3 and 255 characters, lowercase)
 
         ResponseEntity<Void> response = restTemplate.postForEntity(url, validFriend, Void.class);
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     @Test
@@ -41,6 +45,6 @@ class FgCstationsApplicationTests {
         invalidFriend.setUsername("ab"); // Invalid username (less than 3 characters, lowercase)
 
         ResponseEntity<Void> response = restTemplate.postForEntity(url, invalidFriend, Void.class);
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 }
